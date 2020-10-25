@@ -10,7 +10,6 @@ const visit = require('unist-util-visit')
 const ReactDom = require('react-dom/server')
 const renderer = require('react-test-renderer')
 const math = require('remark-math')
-const reactKatex = require('react-katex')
 const htmlParser = require('../src/plugins/html-parser')
 const Markdown = require('../src/react-markdown')
 const MarkdownWithHtml = require('../src/with-html')
@@ -706,14 +705,9 @@ test('can render the whole spectrum of markdown within a single run (with html p
 test('passes along all props when the node type is unknown', () => {
   expect.assertions(1)
 
-  /* eslint-disable no-console */
-  // React warns about something in react-katex currently.
-  const warn = console.warn
-  console.warn = Function.prototype
-
   const renderers = {
-    inlineMath: ({value}) => <reactKatex.InlineMath math={value} />,
-    math: ({value}) => <reactKatex.BlockMath math={value} />
+    inlineMath: ({value}) => <div className="inline-math">{JSON.stringify(value)}</div>,
+    math: ({value}) => <div className="block-math">{JSON.stringify(value)}</div>
   }
   renderers.inlineMath.displayName = 'inlineMath'
   renderers.math.displayName = 'math'
@@ -726,9 +720,6 @@ test('passes along all props when the node type is unknown', () => {
   )
 
   expect(component.toJSON()).toMatchSnapshot()
-
-  console.warn = warn
-  /* eslint-enable no-console */
 })
 
 test('can match and reactify cheap/simple inline html', () => {
